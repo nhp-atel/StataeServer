@@ -1849,6 +1849,10 @@
 
             // Save swap state to database via SwapStateServer.aspx
             async function saveSwapToServer(sortID, swapMapping) {
+                console.log('=== SAVE SWAP TO SERVER ===');
+                console.log('SortID:', sortID);
+                console.log('Swap Mapping (Map):', Array.from(swapMapping.entries()));
+
                 try {
                     // Convert Map to plain object for JSON serialization
                     const mappingObj = {};
@@ -1856,63 +1860,112 @@
                         mappingObj[source] = target;
                     });
 
+                    const payload = {
+                        sortid: sortID,
+                        mapping: mappingObj,
+                        message: `Swap state updated at ${new Date().toLocaleString()}`
+                    };
+
+                    console.log('Request Payload:', JSON.stringify(payload, null, 2));
+
                     const response = await fetch('SwapStateServer.aspx', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({
-                            sortid: sortID,
-                            mapping: mappingObj,
-                            message: `Swap state updated at ${new Date().toLocaleString()}`
-                        })
+                        body: JSON.stringify(payload)
                     });
 
+                    console.log('Response Status:', response.status, response.statusText);
+                    console.log('Response Headers:', {
+                        contentType: response.headers.get('content-type'),
+                        contentLength: response.headers.get('content-length')
+                    });
+
+                    const responseText = await response.text();
+                    console.log('Response Body (raw):', responseText);
+
                     if (!response.ok) {
-                        const errorData = await response.json();
-                        console.error('Failed to save swap state:', errorData);
+                        console.error('❌ SAVE FAILED - Response not OK');
+                        try {
+                            const errorData = JSON.parse(responseText);
+                            console.error('Error Data:', errorData);
+                        } catch (e) {
+                            console.error('Could not parse error response as JSON');
+                        }
                         return false;
                     }
 
-                    const result = await response.json();
-                    console.log('Swap state saved to server:', result);
+                    const result = JSON.parse(responseText);
+                    console.log('✅ SWAP SAVED SUCCESSFULLY:', result);
                     return true;
                 } catch (error) {
-                    console.error('Error saving swap state to server:', error);
+                    console.error('❌ EXCEPTION DURING SAVE:');
+                    console.error('Error Type:', error.name);
+                    console.error('Error Message:', error.message);
+                    console.error('Stack Trace:', error.stack);
                     return false;
                 }
             }
 
             // Load swap state from database via SwapStateServer.aspx
             async function loadSwapFromServer(sortID) {
+                console.log('=== LOAD SWAP FROM SERVER ===');
+                console.log('SortID:', sortID);
+
                 try {
-                    const response = await fetch(`SwapStateServer.aspx?sortid=${sortID}`, {
+                    const url = `SwapStateServer.aspx?sortid=${sortID}`;
+                    console.log('Fetching from URL:', url);
+
+                    const response = await fetch(url, {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json'
                         }
                     });
 
+                    console.log('Response Status:', response.status, response.statusText);
+                    console.log('Response Headers:', {
+                        contentType: response.headers.get('content-type'),
+                        contentLength: response.headers.get('content-length')
+                    });
+
+                    const responseText = await response.text();
+                    console.log('Response Body (raw):', responseText);
+
                     if (!response.ok) {
-                        console.error('Failed to load swap state from server');
+                        console.error('❌ LOAD FAILED - Response not OK');
                         return null;
                     }
 
-                    const data = await response.json();
-                    console.log('Loaded swap state from server:', data);
+                    const data = JSON.parse(responseText);
+                    console.log('Parsed Response Data:', data);
+                    console.log('Mapping Object:', data.mapping);
+                    console.log('Mapping Type:', typeof data.mapping);
 
                     // Convert plain object back to Map
                     if (data.mapping && typeof data.mapping === 'object') {
                         const swapMap = new Map();
-                        Object.entries(data.mapping).forEach(([source, target]) => {
+                        const entries = Object.entries(data.mapping);
+                        console.log('Mapping Entries:', entries);
+
+                        entries.forEach(([source, target]) => {
                             swapMap.set(source, target);
+                            console.log(`  Adding to Map: ${source} -> ${target}`);
                         });
+
+                        console.log('✅ SWAP LOADED SUCCESSFULLY - Map size:', swapMap.size);
+                        console.log('Final Swap Map:', Array.from(swapMap.entries()));
                         return swapMap;
                     }
 
+                    console.log('⚠️ No valid mapping found in response');
                     return null;
                 } catch (error) {
-                    console.error('Error loading swap state from server:', error);
+                    console.error('❌ EXCEPTION DURING LOAD:');
+                    console.error('Error Type:', error.name);
+                    console.error('Error Message:', error.message);
+                    console.error('Stack Trace:', error.stack);
                     return null;
                 }
             }
