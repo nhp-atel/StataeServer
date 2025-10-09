@@ -2080,8 +2080,9 @@
 
             // Enhanced cell value writing
             function writeCellValue(cell, value, type) {
+                // FIXED: Display "0" instead of blank when value is 0
                 if (value === 0) {
-                    cell.innerHTML = "&nbsp;";
+                    cell.textContent = type === "percent" ? "0%" : "0";
                     return;
                 }
                 if (type === "percent") {
@@ -2141,11 +2142,35 @@
                         });
                     });
 
-                    // Remove this transaction and all newer ones from history
-                    transactionHistory.splice(transactionIndex);
-                    updateTransactionPanel();
+                    // FIXED: Remove ONLY this single transaction, not all newer ones
+                    transactionHistory.splice(transactionIndex, 1);
 
-                    showTransferStatus(`Rolled back to state before: ${transaction.description}`, 'success');
+                    // If this was a swap transaction, remove it from swapStateManager
+                    if (transaction.type === 'swap' && transaction.sourceStation && transaction.targetStation) {
+                        const sourceStation = transaction.sourceStation;
+                        const targetStation = transaction.targetStation;
+
+                        console.log(`Undoing swap: ${sourceStation} ↔ ${targetStation}`);
+
+                        // Remove the bidirectional mapping from activeSwaps
+                        swapStateManager.activeSwaps.delete(sourceStation);
+                        swapStateManager.activeSwaps.delete(targetStation);
+
+                        console.log('Updated active swaps after undo:', Array.from(swapStateManager.activeSwaps.entries()));
+
+                        // Save the updated swap state to database
+                        if (currentSortID) {
+                            saveSwapToServer(currentSortID, swapStateManager.activeSwaps).then(success => {
+                                if (success) {
+                                    console.log('Swap state updated in database after undo');
+                                    refreshSwapDisplay();
+                                }
+                            });
+                        }
+                    }
+
+                    updateTransactionPanel();
+                    showTransferStatus(`Rolled back: ${transaction.description}`, 'success');
                 }
             }
 
@@ -2934,21 +2959,31 @@
             // Show debug information about current swap state
             function showSwapDebugInfo() {
                 console.log('=== SWAP DEBUG INFO ===');
-                console.log('Active Swaps:', Array.from(swapStateManager.activeSwaps.entries()));
-                console.log('Original Values Keys:', Array.from(swapStateManager.originalValues.keys()));
-                console.log('Swap Chains:', Array.from(swapStateManager.swapChains.entries()));
+                console.log('Active Swaps Map:', Array.from(swapStateManager.activeSwaps.entries()));
                 console.log('Swap Summary:', swapStateManager.getSwapSummary());
+                console.log('Transaction History:', transactionHistory);
                 console.log('Transaction History Length:', transactionHistory.length);
+                console.log('Current Sort ID:', currentSortID);
 
                 // Show summary in UI
                 const swapSummary = swapStateManager.getSwapSummary();
-                const debugMsg = `Debug Info (see console for details):
 
-Active Swaps: ${swapSummary.length}
-Stations with Original Values: ${swapStateManager.originalValues.size}
-Transaction History: ${transactionHistory.length} entries
+                // Build transaction history summary
+                const transactionSummary = transactionHistory.map((t, i) =>
+                    `  ${i + 1}. ${t.type}: ${t.description}`
+                ).join('\n') || '  None';
 
-Swaps: ${swapSummary.map(s => `${s.source}↔${s.target}`).join(', ') || 'None'}`;
+                const debugMsg = `=== SWAP DEBUG INFO ===
+
+Active Swaps: ${swapSummary.length} pair(s)
+${swapSummary.map(s => `  • ${s.source} ↔ ${s.target}`).join('\n') || '  None'}
+
+Transaction History: ${transactionHistory.length} transaction(s)
+${transactionSummary}
+
+Current Sort ID: ${currentSortID || 'Not set'}
+
+(See browser console for detailed logs)`;
 
                 alert(debugMsg);
             }
