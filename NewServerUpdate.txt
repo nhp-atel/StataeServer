@@ -1713,6 +1713,32 @@
                 { key: "CFPct", type: "percent", mode: "swap", label: "Chutefull %" },
             ];
 
+            // Station to Outbound mapping - defines which OB each station feeds into
+            const STATION_TO_OUTBOUND = {
+                'S01': 'OB06', 'S02': 'OB06',
+                'S03': 'OB07', 'S04': 'OB07',
+                'S05': 'OB08', 'S06': 'OB08',
+                'S07': 'OB09', 'S08': 'OB09',
+                'S09': 'OB10', 'S10': 'OB10',
+                'S11': 'OB01', 'S12': 'OB01',
+                'S13': 'OB02', 'S14': 'OB02',
+                'S15': 'OB03', 'S16': 'OB03',
+                'S17': 'OB04', 'S18': 'OB04',
+                'S19': 'OB05', 'S20': 'OB05',
+                'S21': 'OB01',
+                'S22': 'OB02'
+            };
+
+            // All station names for iteration
+            const ALL_STATIONS = [
+                'S01', 'S02', 'S03', 'S04', 'S05', 'S06', 'S07', 'S08', 'S09', 'S10',
+                'S11', 'S12', 'S13', 'S14', 'S15', 'S16', 'S17', 'S18', 'S19', 'S20',
+                'S21', 'S22'
+            ];
+
+            // All outbound names
+            const ALL_OUTBOUNDS = ['OB01', 'OB02', 'OB03', 'OB04', 'OB05', 'OB06', 'OB07', 'OB08', 'OB09', 'OB10'];
+
             // Transaction history for data preservation
             let transactionHistory = [];
             const MAX_HISTORY_SIZE = 10;
@@ -2022,6 +2048,10 @@
                     });
 
                     console.log('Swap restoration completed using fresh server data');
+
+                    // OUTBOUND RECALCULATION: After restoring swaps, recalculate OB totals
+                    console.log('Recalculating outbound totals after swap restoration...');
+                    setTimeout(() => recalculateOutboundTotals(), 100);
                 },
 
                 // Swap fresh data between two stations (data that just loaded from server)
@@ -2059,6 +2089,235 @@
                     console.log(`Swapped fresh data: ${stationA} ↔ ${stationB}`);
                 }
             };
+
+            // ==========================================
+            // OUTBOUND RECALCULATION SYSTEM
+            // ==========================================
+
+            /**
+             * Gets the effective outbound for a station considering current swaps
+             * @param {string} station - Station name (e.g., 'S01')
+             * @returns {string} - Outbound name (e.g., 'OB06')
+             */
+            function getEffectiveOutbound(station) {
+                // The physical position determines which OB the data contributes to
+                // If S01 is swapped with S03, then:
+                // - Data displayed at S01 position → feeds S01's original OB (OB06)
+                // - Data displayed at S03 position → feeds S03's original OB (OB07)
+
+                // Since we want data to follow its NEW position, we use the original mapping
+                return STATION_TO_OUTBOUND[station] || null;
+            }
+
+            /**
+             * Recalculates all outbound totals based on current station data and swap state
+             * This ensures OB totals reflect the swapped positions of stations
+             */
+            function recalculateOutboundTotals() {
+                console.log('=== RECALCULATING OUTBOUND TOTALS ===');
+
+                // Initialize accumulators for each outbound
+                const outboundData = {};
+                ALL_OUTBOUNDS.forEach(ob => {
+                    outboundData[ob] = {
+                        Vol: 0,
+                        BS: 0,
+                        CF: 0,
+                        UTPct_sum: 0,
+                        UTPct_count: 0,
+                        DecPct: 0,
+                        CFPct_sum: 0,
+                        CFPct_count: 0
+                    };
+                });
+
+                // For each station, read its CURRENT (possibly swapped) data
+                // and add it to the appropriate outbound
+                ALL_STATIONS.forEach(stationPosition => {
+                    const targetOB = getEffectiveOutbound(stationPosition);
+                    if (!targetOB) return;
+
+                    console.log(`Processing ${stationPosition} → ${targetOB}`);
+
+                    // Read current values from this station's position
+                    METRICS.forEach(metric => {
+                        const cellId = `${stationPosition}_${metric.key}`;
+                        const cell = document.getElementById(cellId);
+
+                        if (cell) {
+                            const value = readCellValue(cell, metric.type);
+
+                            if (value !== null && value !== undefined) {
+                                if (metric.key === 'Vol') {
+                                    outboundData[targetOB].Vol += value;
+                                } else if (metric.key === 'BS') {
+                                    outboundData[targetOB].BS += value;
+                                } else if (metric.key === 'CF') {
+                                    outboundData[targetOB].CF += value;
+                                } else if (metric.key === 'UTPct' && value > 0) {
+                                    outboundData[targetOB].UTPct_sum += value;
+                                    outboundData[targetOB].UTPct_count++;
+                                } else if (metric.key === 'DecPct') {
+                                    // Decline is typically already a percentage, we'll take max or average
+                                    outboundData[targetOB].DecPct = Math.max(outboundData[targetOB].DecPct, value);
+                                } else if (metric.key === 'CFPct' && value > 0) {
+                                    outboundData[targetOB].CFPct_sum += value;
+                                    outboundData[targetOB].CFPct_count++;
+                                }
+                            }
+                        }
+                    });
+                });
+
+                // Calculate averages for percentages
+                ALL_OUTBOUNDS.forEach(ob => {
+                    if (outboundData[ob].UTPct_count > 0) {
+                        outboundData[ob].UTPct = outboundData[ob].UTPct_sum / outboundData[ob].UTPct_count;
+                    } else {
+                        outboundData[ob].UTPct = 0;
+                    }
+
+                    if (outboundData[ob].CFPct_count > 0) {
+                        outboundData[ob].CFPct = outboundData[ob].CFPct_sum / outboundData[ob].CFPct_count;
+                    } else {
+                        outboundData[ob].CFPct = 0;
+                    }
+                });
+
+                console.log('Calculated Outbound Data:', outboundData);
+
+                // Update the DOM with new totals
+                ALL_OUTBOUNDS.forEach(ob => {
+                    const data = outboundData[ob];
+
+                    // Update Volume
+                    const volCell = document.getElementById(`${ob}_Vol`);
+                    if (volCell) volCell.textContent = data.Vol.toLocaleString();
+
+                    // Update Belt Stops
+                    const bsCell = document.getElementById(`${ob}_BS`);
+                    if (bsCell) bsCell.textContent = data.BS.toLocaleString();
+
+                    // Update Chutefulls
+                    const cfCell = document.getElementById(`${ob}_CF`);
+                    if (cfCell) cfCell.textContent = data.CF.toLocaleString();
+
+                    // Update Uptime %
+                    const utCell = document.getElementById(`${ob}_UTPct`);
+                    if (utCell) utCell.textContent = data.UTPct.toFixed(2) + '%';
+
+                    // Update Decline %
+                    const decCell = document.getElementById(`${ob}_DecPct`);
+                    if (decCell) decCell.textContent = data.DecPct.toFixed(0) + '%';
+
+                    // Update Chutefull %
+                    const cfPctCell = document.getElementById(`${ob}_CFPct`);
+                    if (cfPctCell) cfPctCell.textContent = data.CFPct.toFixed(0) + '%';
+
+                    console.log(`Updated ${ob}: Vol=${data.Vol}, BS=${data.BS}, CF=${data.CF}, UTPct=${data.UTPct.toFixed(2)}%`);
+                });
+
+                // Recalculate North and South totals
+                recalculateNorthSouthTotals(outboundData);
+
+                console.log('=== OUTBOUND RECALCULATION COMPLETE ===');
+            }
+
+            /**
+             * Recalculates North and South totals from their respective outbounds
+             * North = OB01-05, South = OB06-10
+             */
+            function recalculateNorthSouthTotals(outboundData) {
+                const northOBs = ['OB01', 'OB02', 'OB03', 'OB04', 'OB05'];
+                const southOBs = ['OB06', 'OB07', 'OB08', 'OB09', 'OB10'];
+
+                // Calculate North totals
+                const northTotals = { Vol: 0, BS: 0, CF: 0, UTPct_sum: 0, UTPct_count: 0, DecPct: 0, CFPct_sum: 0, CFPct_count: 0 };
+                northOBs.forEach(ob => {
+                    northTotals.Vol += outboundData[ob].Vol;
+                    northTotals.BS += outboundData[ob].BS;
+                    northTotals.CF += outboundData[ob].CF;
+                    northTotals.DecPct = Math.max(northTotals.DecPct, outboundData[ob].DecPct);
+                    if (outboundData[ob].UTPct > 0) {
+                        northTotals.UTPct_sum += outboundData[ob].UTPct;
+                        northTotals.UTPct_count++;
+                    }
+                    if (outboundData[ob].CFPct > 0) {
+                        northTotals.CFPct_sum += outboundData[ob].CFPct;
+                        northTotals.CFPct_count++;
+                    }
+                });
+
+                // Calculate South totals
+                const southTotals = { Vol: 0, BS: 0, CF: 0, UTPct_sum: 0, UTPct_count: 0, DecPct: 0, CFPct_sum: 0, CFPct_count: 0 };
+                southOBs.forEach(ob => {
+                    southTotals.Vol += outboundData[ob].Vol;
+                    southTotals.BS += outboundData[ob].BS;
+                    southTotals.CF += outboundData[ob].CF;
+                    southTotals.DecPct = Math.max(southTotals.DecPct, outboundData[ob].DecPct);
+                    if (outboundData[ob].UTPct > 0) {
+                        southTotals.UTPct_sum += outboundData[ob].UTPct;
+                        southTotals.UTPct_count++;
+                    }
+                    if (outboundData[ob].CFPct > 0) {
+                        southTotals.CFPct_sum += outboundData[ob].CFPct;
+                        southTotals.CFPct_count++;
+                    }
+                });
+
+                // Update North cells
+                const northVol = document.getElementById('North_Vol');
+                if (northVol) northVol.textContent = northTotals.Vol.toLocaleString();
+
+                const northBS = document.getElementById('North_BS');
+                if (northBS) northBS.textContent = northTotals.BS.toLocaleString();
+
+                const northCF = document.getElementById('North_CF');
+                if (northCF) northCF.textContent = northTotals.CF.toLocaleString();
+
+                const northUTPct = document.getElementById('North_UTPct');
+                if (northUTPct) {
+                    const avgUTPct = northTotals.UTPct_count > 0 ? northTotals.UTPct_sum / northTotals.UTPct_count : 0;
+                    northUTPct.textContent = avgUTPct.toFixed(2) + '%';
+                }
+
+                const northDecPct = document.getElementById('North_DecPct');
+                if (northDecPct) northDecPct.textContent = northTotals.DecPct.toFixed(0) + '%';
+
+                const northCFPct = document.getElementById('North_CFPct');
+                if (northCFPct) {
+                    const avgCFPct = northTotals.CFPct_count > 0 ? northTotals.CFPct_sum / northTotals.CFPct_count : 0;
+                    northCFPct.textContent = avgCFPct.toFixed(0) + '%';
+                }
+
+                // Update South cells
+                const southVol = document.getElementById('South_Vol');
+                if (southVol) southVol.textContent = southTotals.Vol.toLocaleString();
+
+                const southBS = document.getElementById('South_BS');
+                if (southBS) southBS.textContent = southTotals.BS.toLocaleString();
+
+                const southCF = document.getElementById('South_CF');
+                if (southCF) southCF.textContent = southTotals.CF.toLocaleString();
+
+                const southUTPct = document.getElementById('South_UTPct');
+                if (southUTPct) {
+                    const avgUTPct = southTotals.UTPct_count > 0 ? southTotals.UTPct_sum / southTotals.UTPct_count : 0;
+                    southUTPct.textContent = avgUTPct.toFixed(2) + '%';
+                }
+
+                const southDecPct = document.getElementById('South_DecPct');
+                if (southDecPct) southDecPct.textContent = southTotals.DecPct.toFixed(0) + '%';
+
+                const southCFPct = document.getElementById('South_CFPct');
+                if (southCFPct) {
+                    const avgCFPct = southTotals.CFPct_count > 0 ? southTotals.CFPct_sum / southTotals.CFPct_count : 0;
+                    southCFPct.textContent = avgCFPct.toFixed(0) + '%';
+                }
+
+                console.log('Updated North totals:', northTotals);
+                console.log('Updated South totals:', southTotals);
+            }
 
             // Enhanced cell value reading
             function readCellValue(cell, type) {
@@ -2170,6 +2429,11 @@
                     }
 
                     updateTransactionPanel();
+
+                    // OUTBOUND RECALCULATION: After undo, recalculate OB totals
+                    console.log('Recalculating outbound totals after undo...');
+                    setTimeout(() => recalculateOutboundTotals(), 50);
+
                     showTransferStatus(`Rolled back: ${transaction.description}`, 'success');
                 }
             }
@@ -2230,6 +2494,10 @@
                     timestamp: new Date(),
                     description: `Swapped all data between ${sourceStation} and ${targetStation}`
                 });
+
+                // OUTBOUND RECALCULATION: After swapping stations, recalculate OB totals
+                console.log('Recalculating outbound totals after swap...');
+                setTimeout(() => recalculateOutboundTotals(), 50);
 
                 return swappedCount === METRICS.length;
             }
