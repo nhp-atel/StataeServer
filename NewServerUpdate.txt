@@ -57,7 +57,9 @@
         body {
             background-color: black;
             color: black;
-            zoom: 70%;
+            zoom: 90%;
+            margin: 0;
+            padding: 0;
         }
 
         #table1 td {
@@ -110,7 +112,7 @@
 
 <body>
 
-    <div class="container">
+    <div class="container-fluid">
 
         <div id="dt" class='float-right'> now </div>
 
@@ -497,20 +499,20 @@
             .table-container {
                 display: flex;
                 justify-content: space-between;
-                margin: 0 auto;
+                margin: 10px auto;
                 /* Center the tables */
-                margin-top: 2%
+                max-width: 98%;
             }
 
             /* Set the width of each table */
             .table-container table {
-                width: 500%;
-                margin-right: 3%;
+                width: 48%;
+                margin-right: 1%;
             }
 
             /* Add a gap between the two tables */
             .table-container table:first-child {
-                margin-left: 3%;
+                margin-left: 1%;
                 margin-right: 1%;
             }
 
@@ -546,12 +548,12 @@
             /* ENHANCED TRANSFER CONTROLS STYLING */
             .transfer-section {
                 background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-                padding: 25px;
-                margin: 30px auto;
+                padding: 15px;
+                margin: 15px auto;
                 border-radius: 12px;
                 border: 3px solid #3498db;
                 box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
-                max-width: 800px;
+                max-width: 95%;
                 position: relative;
                 overflow: hidden;
             }
