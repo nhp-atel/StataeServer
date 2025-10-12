@@ -1,3 +1,45 @@
+Conversation opened. 4 messages. All messages read.
+
+Skip to content
+Using Gmail with screen readers
+Enable desktop notifications for Gmail.
+   OK  No thanks
+18 of 19,511
+New
+Inbox
+
+Nimesh P <nimeshp136593@gmail.com>
+Attachments
+Thu, Oct 9, 8:33 AM (3 days ago)
+to me
+
+ One attachment
+  •  Scanned by Gmail
+
+Nimesh P <nimeshp136593@gmail.com>
+Attachments
+Fri, Oct 10, 8:07 AM (2 days ago)
+to me
+
+
+On Thu, Oct 9, 2025, 8:33 AM Nimesh P <nimeshp136593@gmail.com> wrote:
+
+ One attachment
+  •  Scanned by Gmail
+
+Nimesh P <nimeshp136593@gmail.com>
+Fri, Oct 10, 1:29 PM (2 days ago)
+to me
+
+Screenshot 2025-10-10 104656.png
+
+Nimesh P <nimeshp136593@gmail.com>
+Attachments
+Fri, Oct 10, 3:59 PM (2 days ago)
+to me
+
+ One attachment
+  •  Scanned by Gmail
 <!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -57,9 +99,7 @@
         body {
             background-color: black;
             color: black;
-            zoom: 90%;
-            margin: 0;
-            padding: 0;
+            zoom: 65%;
         }
 
         #table1 td {
@@ -69,13 +109,16 @@
         td {
             text-align: center;
             border: 1px solid gray;
+            font-size: 10px;
+            padding: 2px 4px;
         }
 
         th {
             text-align: center;
             font-weight: bold;
             border: 2px solid white;
-
+            font-size: 11px;
+            padding: 3px 5px;
         }
 
         #South th {
@@ -83,6 +126,8 @@
             font-weight: bold;
             border: 2px solid white;
             background: steelblue;
+            font-size: 11px;
+            padding: 3px 5px;
         }
 
         #North th {
@@ -90,6 +135,8 @@
             font-weight: bold;
             border: 2px solid white;
             background: rgba(255, 140, 0, 0.636);
+            font-size: 11px;
+            padding: 3px 5px;
         }
 
         /* Apply alternate column colors */
@@ -105,6 +152,7 @@
 
         .rowhead {
             text-align: center;
+            font-size: 10px;
         }
     </style>
 
@@ -112,37 +160,94 @@
 
 <body>
 
+    <style>
+        /* Main layout grid - 3 columns, no scrolling */
+        .main-layout-grid {
+            display: grid;
+            grid-template-columns: 25% 45% 30%;
+            grid-template-rows: auto;
+            gap: 8px;
+            padding: 5px;
+            max-height: calc(100vh - 60px);
+            overflow: hidden;
+        }
+
+        .left-column {
+            grid-column: 1;
+            grid-row: 1;
+            overflow-y: auto;
+            max-height: calc(100vh - 70px);
+        }
+
+        .middle-column {
+            grid-column: 2;
+            grid-row: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .right-column {
+            grid-column: 3;
+            grid-row: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            max-height: calc(100vh - 70px);
+            overflow-y: auto;
+        }
+
+        /* Compact table styling */
+        .compact-table {
+            font-size: 9px;
+            width: 100%;
+        }
+
+        .compact-table td, .compact-table th {
+            padding: 1px 2px;
+        }
+    </style>
+
     <div class="container-fluid">
+        <!-- Top controls bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 5px; background: black;">
+            <table id="table1" style="display: inline-block;">
+                <tr>
+                    <td class="dropdown-wrapper" style="background-color: black;">
+                        <select name="sortSel" id="sortSel">
+                        </select>
+                    </td>
+                    <td>
+                        <button onclick="openPrintDialog()"
+                            style="margin-left: 10px; padding: 6px; border: 4px solid red;">Print</button>
+                    </td>
+                </tr>
+            </table>
+            <div id="dt" style="color: white; font-weight: bold;"> now </div>
+        </div>
 
-        <div id="dt" class='float-right'> now </div>
-
-        <br />
-        <table id="table1" class="display" style="width:100%;">
-            <tr>
-                <td class="dropdown-wrapper" style="background-color: black;">
-                    <select name="sortSel" id="sortSel">
-                    </select>
-
-                </td>
-                <button onclick="openPrintDialog()"
-                    style="margin-left: auto; margin-right: auto; padding: 6px; border: 4px solid red;">Print</button>
-            </tr>
-        </table>
-
-        <br />
-        <div class="row">
-            <!-- old uptime % table position | 10/4/24 | W.Rodriguez -->
-            <div class="col-lg">
+        <!-- Main content grid -->
+        <div class="main-layout-grid">
+            <!-- LEFT COLUMN: Hourly Quicklook + Primary Stats + Small Sort -->
+            <div class="left-column">
+                <div class="col-lg">
                 <style>
                     h2 {
-                        text-align: center;
+                        text-align: left;
                         border-style: solid;
-                        margin-bottom: -4px;
-                        padding: 4px;
+                        margin-bottom: 2px;
+                        padding: 3px;
+                        color: #fff;
+                        font-size: 14px;
+                    }
+                    h3 {
+                        font-size: 12px;
+                        margin: 5px 0;
+                        padding: 2px;
                     }
                 </style>
                 <h2 style="color: white;">Building Hourly Quicklook</h2>
-                <table id="HourlyTable" class="display" style="width:100%">
+                <table id="HourlyTable" class="display compact-table" style="width:100%; font-size: 9px;">
 
                     <!-- This section is a half hour table without a DELTA calculation. Stored Procedure intervals need to be modified to 30 minutes if this is used.-->
                     <tr>
@@ -349,8 +454,8 @@
                     </tr>
                 </table>
                 <!-- New primary stats edits | 10/4/24 | W.Rodriguez | table id="PrimaryStatsTable" -->
-                <h3> </h3>
-                <table id="Primary" class="display" style="width:100%">
+                <h3 style="margin: 5px 0; padding: 0;"> </h3>
+                <table id="Primary" class="display compact-table" style="width:100%; font-size: 9px;">
                     <tr>
                         <th scope="col"></th>
                         <th scope="col">NW</th>
@@ -389,14 +494,14 @@
                 <!-- New primary stats edits | 10/4/24 | W.Rodriguez -->
             </div>
             <!-- New SS  edits | 10/8/24 | W.Rodriguez -->
-            <table id="Smalls" class="display" style="margin-left: auto; margin-right: auto;">
-                <th id="Smalls th" colspan="5">Small Sort Uptime %</th>
+            <table id="Smalls" class="display compact-table" style="margin-left: auto; margin-right: auto; margin-top: 5px; font-size: 9px;">
+                <th id="Smalls th" colspan="5" style="font-size: 11px; padding: 3px;">Small Sort Uptime %</th>
                 <tr>
                     <!--id="OB01_UTPct" "SLS01_UPT" -->
-                    <td style="padding: 6px;">SLS01</td>
-                    <td id="BF1_UTPct" class="rowhead" style="padding: 6px;"></td>
-                    <td style="padding: 6px;">SS1</td>
-                    <td id="SS1F1_UTPct" class="rowhead" style="padding: 6px;"></td>
+                    <td style="padding: 2px;">SLS01</td>
+                    <td id="BF1_UTPct" class="rowhead" style="padding: 2px;"></td>
+                    <td style="padding: 2px;">SS1</td>
+                    <td id="SS1F1_UTPct" class="rowhead" style="padding: 2px;"></td>
                 </tr>
                 <tr>
                     <td>SLS02</td>
@@ -490,30 +595,33 @@
                 </tr>
             </table>
             <!-- New SS edits | 10/8/24 | W.Rodriguez -->
-        </div>
-    </div>
-    <div>
+                </div>
+            </div>
+            <!-- End LEFT COLUMN -->
+
+            <!-- MIDDLE COLUMN: North/South Outbounds with hour buttons -->
+            <div class="middle-column">
+                <!-- Table container will be inserted here from line 1168 -->
         <style>
             /* Container for tables and buttons */
             /* Adjust table styles */
             .table-container {
                 display: flex;
                 justify-content: space-between;
-                margin: 10px auto;
-                /* Center the tables */
-                max-width: 98%;
+                margin: 0 auto;
+                gap: 5px;
+                padding: 2px;
             }
 
             /* Set the width of each table */
             .table-container table {
-                width: 48%;
-                margin-right: 1%;
+                width: 100%;
+                font-size: 9px;
             }
 
             /* Add a gap between the two tables */
             .table-container table:first-child {
-                margin-left: 1%;
-                margin-right: 1%;
+                margin-right: 5px;
             }
 
             /* Button styles */
@@ -525,15 +633,23 @@
             }
 
             .button {
-                margin-top: 3px;
-                width: 80px;
+                margin-top: 2px;
+                width: 70px;
                 cursor: pointer;
-
+                padding: 4px;
+                font-size: 10px;
             }
 
             .button.active {
                 background-color: #007bff;
                 color: #fff;
+            }
+
+            .button-container {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+                padding: 2px;
             }
 
             .center1 {
@@ -548,12 +664,11 @@
             /* ENHANCED TRANSFER CONTROLS STYLING */
             .transfer-section {
                 background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-                padding: 15px;
-                margin: 15px auto;
-                border-radius: 12px;
-                border: 3px solid #3498db;
-                box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
-                max-width: 95%;
+                padding: 8px;
+                margin: 5px 0;
+                border-radius: 8px;
+                border: 2px solid #3498db;
+                box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
                 position: relative;
                 overflow: hidden;
             }
@@ -577,10 +692,10 @@
             .transfer-section h3 {
                 color: #ffffff;
                 text-align: center;
-                margin-bottom: 25px;
-                font-size: 1.8em;
+                margin-bottom: 8px;
+                font-size: 1em;
                 font-weight: bold;
-                text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
                 position: relative;
                 z-index: 2;
             }
@@ -589,10 +704,10 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                gap: 20px;
-                padding: 20px;
+                gap: 8px;
+                padding: 8px;
                 background: rgba(0, 0, 0, 0.3);
-                border-radius: 10px;
+                border-radius: 6px;
                 border: 2px solid #3498db;
                 position: relative;
                 z-index: 2;
@@ -601,20 +716,21 @@
             .transfer-controls.unified label {
                 color: #ffffff;
                 font-weight: bold;
-                font-size: 14px;
+                font-size: 11px;
                 text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
                 min-width: auto;
             }
 
             .transfer-controls.unified select {
-                padding: 10px 15px;
-                border-radius: 8px;
+                color-scheme: dark;
+                padding: 6px 8px;
+                border-radius: 6px;
                 border: 2px solid #3498db;
                 background: linear-gradient(135deg, #34495e, #2c3e50);
                 color: #ffffff;
                 font-weight: bold;
-                font-size: 14px;
-                min-width: 120px;
+                font-size: 11px;
+                min-width: 80px;
                 cursor: pointer;
                 transition: all 0.3s ease;
             }
@@ -631,16 +747,16 @@
             }
 
             .transfer-controls.unified button {
-                padding: 12px 25px;
-                border-radius: 8px;
+                padding: 6px 12px;
+                border-radius: 6px;
                 border: none;
                 background: linear-gradient(135deg, #e74c3c, #c0392b);
                 color: #ffffff;
                 font-weight: bold;
-                font-size: 16px;
+                font-size: 11px;
                 cursor: pointer;
                 transition: all 0.3s ease;
-                box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+                box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4);
                 position: relative;
                 overflow: hidden;
             }
@@ -654,6 +770,17 @@
                 height: 100%;
                 background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
                 transition: left 0.5s;
+            }
+
+            .transfer-controls.unified select option,
+            .transfer-controls.unified select optgroup {
+            background-color: #1f2a35;
+            color: #ffffff;
+            }
+            .transfer-controls.unified select option:hover,
+            .transfer-controls.unified select option:checked {
+            background-color: #2d4255;
+            color: #ffffff;
             }
 
             .transfer-controls.unified button:hover::before {
@@ -1410,15 +1537,593 @@
             </table>
 
         </div>
+            </div>
+            <!-- End MIDDLE COLUMN -->
 
-        <!-- ENHANCED TRANSFER SECTION WITH SAME COLOR HIGHLIGHTING -->
-        <div class="transfer-section">
-            <h3> Enhanced Station Data Transfer</h3>
+            <!-- RIGHT COLUMN: Enhanced Transfer + Swap Management + Uptime -->
+            <div class="right-column">
+                <!-- Enhanced Station Data Transfer -->
+                <div class="transfer-section" style="margin: 5px 0; padding: 8px;">
+                    <h3 style="font-size: 1em; margin-bottom: 8px;"> Enhanced Station Data Transfer</h3>
+                    <div class="transfer-controls unified" style="padding: 8px;">
+                        <div class="transfer-row" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                            <label for="masterSource">Source:</label>
+                            <select id="masterSource" style="padding: 6px;">
+                                <option value="S01">S1</option>
+                                <option value="S02">S2</option>
+                                <option value="S03">S3</option>
+                                <option value="S04">S4</option>
+                                <option value="S05">S5</option>
+                                <option value="S06">S6</option>
+                                <option value="S07">S7</option>
+                                <option value="S08">S8</option>
+                                <option value="S09">S9</option>
+                                <option value="S10">S10</option>
+                                <option value="S11">S11</option>
+                                <option value="S12">S12</option>
+                                <option value="S13">S13</option>
+                                <option value="S14">S14</option>
+                                <option value="S15">S15</option>
+                                <option value="S16">S16</option>
+                                <option value="S17">S17</option>
+                                <option value="S18">S18</option>
+                                <option value="S19">S19</option>
+                                <option value="S20">S20</option>
+                                <option value="S21">S21</option>
+                                <option value="S22">S22</option>
+                            </select>
 
-            <div class="transfer-controls unified">
-                <div class="transfer-row" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
-                    <label for="masterSource">Source Station:</label>
-                    <select id="masterSource">
+                            <label for="masterTarget">Target:</label>
+                            <select id="masterTarget" style="padding: 6px;">
+                                <option value="S01">S1</option>
+                                <option value="S02">S2</option>
+                                <option value="S03">S3</option>
+                                <option value="S04">S4</option>
+                                <option value="S05">S5</option>
+                                <option value="S06">S6</option>
+                                <option value="S07">S7</option>
+                                <option value="S08">S8</option>
+                                <option value="S09">S9</option>
+                                <option value="S10">S10</option>
+                                <option value="S11">S11</option>
+                                <option value="S12">S12</option>
+                                <option value="S13">S13</option>
+                                <option value="S14">S14</option>
+                                <option value="S15">S15</option>
+                                <option value="S16">S16</option>
+                                <option value="S17">S17</option>
+                                <option value="S18">S18</option>
+                                <option value="S19">S19</option>
+                                <option value="S20">S20</option>
+                                <option value="S21">S21</option>
+                                <option value="S22">S22</option>
+                            </select>
+
+                            <button id="transferBtn" onclick="handleEnhancedTransfer()" style="padding: 8px 12px;"> PREVIEW & SWAP</button>
+                            <button onclick="toggleTransactionPanel()" style="background: #f39c12; padding: 8px 12px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer;">
+                                 History
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Swap Management & Status -->
+                <div class="transfer-section" style="margin: 5px 0; padding: 8px;">
+                    <h3 style="font-size: 1em; margin-bottom: 8px;"> Swap Management & Status</h3>
+                    <div class="transfer-controls unified" style="padding: 8px;">
+                        <div class="transfer-row" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;">
+                            <div id="activeSwapsDisplay" style="background: rgba(52, 152, 219, 0.1); padding: 8px 12px; border-radius: 8px; border: 2px solid #3498db; min-width: 180px;">
+                                <strong style="color: #3498db; font-size: 12px;">Active Swaps:</strong>
+                                <div id="swapsList" style="color: white; margin-top: 5px; font-size: 11px;">
+                                    No active swaps
+                                </div>
+                            </div>
+
+                            <button onclick="clearAllSwaps()" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 11px;">
+                                 Clear All
+                            </button>
+
+                            <button onclick="refreshSwapDisplay()" style="background: linear-gradient(135deg, #27ae60, #229954); color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 11px;">
+                                 Refresh
+                            </button>
+
+                            <button onclick="showSwapDebugInfo()" style="background: linear-gradient(135deg, #8e44ad, #732d91); color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 11px;">
+                                 Debug
+                            </button>
+                        </div>
+
+                        <div id="swapStatusInfo" style="margin-top: 8px; padding: 6px; background: rgba(0,0,0,0.3); border-radius: 8px; color: #bdc3c7; font-size: 10px; text-align: center;">
+                            Swaps persist across hour changes
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exceptions/Uptime table -->
+                <h3 style="text-align:center; color:white; font-size: 12px; margin: 5px 0; padding: 2px;">Uptime % - Exceptions</h3>
+                <table id="Exceptions" class="center compact-table" style="width:98%; margin: 0 auto; font-size: 8px;">
+                    <thead>
+                        <tr><th colspan="14">Uptime %</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>RC01</td>
+                            <td id="RC01_UTPct" class="rowhead"></td>
+                            <td>RC02</td>
+                            <td id="RC02_UTPct" class="rowhead"></td>
+                            <td>RC03</td>
+                            <td id="RC03_UTPct" class="rowhead"></td>
+                            <td>RC04</td>
+                            <td id="RC04_UTPct" class="rowhead"></td>
+                            <td>IR1-F1</td>
+                            <td id="IR1_F1_UTPct" class="rowhead"></td>
+                            <td>IR1-F2</td>
+                            <td id="IR1_F2_UTPct" class="rowhead"></td>
+                            <td>IR2-F1</td>
+                            <td id="IR2_F1_UTPct" class="rowhead"></td>
+                        </tr>
+                        <tr>
+                            <td>IR2-F2</td>
+                            <td id="IR2_F2_UTPct" class="rowhead"></td>
+                            <td>IR2-D6</td>
+                            <td id="IR2_D06_UTPct" class="rowhead"></td>
+                            <td>IR2-D7</td>
+                            <td id="IR2_D07_UTPct" class="rowhead"></td>
+                            <td>IR2-D8</td>
+                            <td id="IR2_D08_UTPct" class="rowhead"></td>
+                            <td>IR2-D9</td>
+                            <td id="IR2_D09_UTPct" class="rowhead"></td>
+                            <td>IR2-10</td>
+                            <td id="IR2_D10_UTPct" class="rowhead"></td>
+                            <td>IR1-D1</td>
+                            <td id="IR1_D01_UTPct" class="rowhead"></td>
+                        </tr>
+                        <tr>
+                            <td>IR1-D2</td>
+                            <td id="IR1_D02_UTPct" class="rowhead"></td>
+                            <td>IR1-D3</td>
+                            <td id="IR1_D03_UTPct" class="rowhead"></td>
+                            <td>IR1-D4</td>
+                            <td id="IR1_D04_UTPct" class="rowhead"></td>
+                            <td>IR1-D5</td>
+                            <td id="IR1_D05_UTPct" class="rowhead"></td>
+                            <td>DA1C</td>
+                            <td id="DA1C_UTPct" class="rowhead"></td>
+                            <td></td>
+                            <td id="DA02C_UTPct" class="rowhead"></td>
+                            <td>DA2S</td>
+                            <td id="DA02_UTPct" class="rowhead"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- End RIGHT COLUMN -->
+
+        </div>
+        <!-- End main-layout-grid -->
+
+        <!-- Transfer Status Indicator -->
+        <div id="transferStatus" class="transfer-status">
+            Transferring data...
+        </div>
+
+        <!-- JavaScript section starts here -->
+        <script>
+
+            $(document).ready(function () {
+
+                $('#dt').text(GetNow())
+
+                $.getJSON('SortDateServer.aspx', function (data) {
+                    console.log('typeof data:', typeof data);
+                    console.log('raw preview:', JSON.stringify(data).slice(0, 200));
+
+                    //populates sort drop down list with the last 4 sort dates
+
+                    $('#sortSel')
+                        .find('option')
+                        .remove()
+                        .end();
+
+
+                    for (var i in data) {
+                        var sortID = data[i].id;
+                        var sortDate = data[i].SortDate;
+                        var sortType = data[i].SortType;
+
+
+                        $('#sortSel').append($('<option>', {
+                            value: sortID,
+                            text: sortDate + ' - ' + sortType
+                        }));
+
+
+                        //load the current entry values
+                        if (i == 0) {
+                            loadCurrentValues(sortID)
+                        }
+                    }
+                });
+
+                $("#sortSel").change(function () {
+                    //console.log("Sort selection changed: " + $("#sortSel").val());
+                    loadCurrentValues($("#sortSel").val())
+                });
+
+
+                function loadCurrentValues(sortID) {
+                    // sanity: make sure we're actually sending a number
+                    console.log('[Hourly] sortid →', sortID);
+
+                    // Update current sortID for swap persistence
+                    currentSortID = sortID;
+
+                    // Load swap state from server BEFORE loading data
+                    loadSwapFromServer(sortID).then(swapMap => {
+                        if (swapMap && swapMap.size > 0) {
+                            console.log('Loaded swap state from server, applying...');
+                            applyLoadedSwapState(swapMap);
+                            refreshSwapDisplay();
+                        }
+                    });
+
+                    // Preserve swap state
+                    const preservedStations = swapInterceptor.beforeDataLoad();
+
+                    $.ajax({
+                        url: '/middleware_alocal/HourlyQuicklookServer_BLDG.aspx', // use absolute path to avoid folder pitfalls
+                        data: { sortid: sortID },   // <-- jQuery encodes this properly
+                        dataType: 'json',           // <-- force JSON parsing
+                        cache: false,               // <-- avoid stale responses
+                        success: function (data, status, xhr) {
+                        // If the server ever returns a stringified JSON, normalize it
+                        if (typeof data === 'string') {
+                            try { data = JSON.parse(data); } catch (e) {
+                            console.error('Not JSON:', data);
+                            return;
+                            }
+                        }
+
+                        // Clear the table
+                        $('#HourlyTable tr').each(function (r) {
+                            if (r > 0) $(this).find('td:gt(0)').text('');
+                        });
+
+                        // Populate
+                        for (let i = 0; i < data.length; i++) {
+                            const row = data[i];
+                            try {
+                            $('#' + row.hourNumber + '_TS').text(row.TS);
+                            $('#' + row.hourNumber + '_BUILDVol').text(Number(row.Building_Total_InputVolume||0).toLocaleString());
+                            $('#' + row.hourNumber + '_PriVol').text(Number(row.Primary_Total_InputVolume||0).toLocaleString());
+                            $('#' + row.hourNumber + '_ExVol').text(Number(row.Exceptions_Total_InputVolume||0).toLocaleString());
+                            $('#' + row.hourNumber + '_OBVol').text(Number(row.Outbound_Total_InputVolume||0).toLocaleString());
+                            $('#' + row.hourNumber + '_BFVol').text(Number(row.Bullfrog_Total_InputVolume||0).toLocaleString());
+                            $('#' + row.hourNumber + '_BFVolPct').text(Number(row.Percent_Smalls||0).toLocaleString() + ' %');
+                            $('#' + row.hourNumber + '_CF').text(Number(row.Outbound_Chutefull_Total||0).toLocaleString());
+                            $('#' + row.hourNumber + '_BS').text(Number(row.BeltStops_Total||0).toLocaleString());
+                            $('#' + row.hourNumber + '_DEFPct').text(Number(row.Defects_Percent||0).toLocaleString() + ' %');
+                            $('#' + row.hourNumber + '_PNRPct').text(Number(row.Primary_Total_NoReadsPct||0).toLocaleString() + ' %');
+                            } catch (_) {}
+                        }
+
+                        // Restore swaps after data load
+                        setTimeout(() => swapInterceptor.restoreSwapsByCurrentState(), 100);
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                        console.error('[Hourly] request failed:', textStatus, errorThrown);
+                        console.error('Status:', jqXHR.status, 'Content-Type:', jqXHR.getResponseHeader('Content-Type'));
+                        console.error('Body:', (jqXHR.responseText || '').slice(0, 1500));
+                        }
+                    });
+                }
+
+
+
+                setInterval(function () {
+                    $('#dt').text(GetNow())
+                    loadCurrentValues($("#sortSel").val())
+                }, 10000);
+
+                // Initial load of outbound values with default criteria
+                selectCriteria(criteria);
+
+
+            });
+
+            // ==========================================
+            // ENHANCED TRANSFER FUNCTIONALITY
+            // ==========================================
+
+            // metrics list with transfer modes
+            // Enhanced metrics configuration for atomic swapping
+            const METRICS = [
+                { key: "Vol", type: "int", mode: "swap", label: "Volume" },
+                { key: "BS", type: "int", mode: "swap", label: "Belt Stops" },
+                { key: "CF", type: "int", mode: "swap", label: "Chutefulls" },
+                { key: "UTPct", type: "percent", mode: "swap", label: "Uptime %" },
+                { key: "DecPct", type: "percent", mode: "swap", label: "Decline %" },
+                { key: "CFPct", type: "percent", mode: "swap", label: "Chutefull %" },
+            ];
+
+            // Station to Outbound mapping - defines which OB each station feeds into
+            const STATION_TO_OUTBOUND = {
+                'S01': 'OB06', 'S02': 'OB06',
+                'S03': 'OB07', 'S04': 'OB07',
+                'S05': 'OB08', 'S06': 'OB08',
+                'S07': 'OB09', 'S08': 'OB09',
+                'S09': 'OB10', 'S10': 'OB10',
+                'S11': 'OB01', 'S12': 'OB01',
+                'S13': 'OB02', 'S14': 'OB02',
+                'S15': 'OB03', 'S16': 'OB03',
+                'S17': 'OB04', 'S18': 'OB04',
+                'S19': 'OB05', 'S20': 'OB05',
+                'S21': 'OB01',
+                'S22': 'OB02'
+            };
+
+            // All station names for iteration
+            const ALL_STATIONS = [
+                'S01', 'S02', 'S03', 'S04', 'S05', 'S06', 'S07', 'S08', 'S09', 'S10',
+                'S11', 'S12', 'S13', 'S14', 'S15', 'S16', 'S17', 'S18', 'S19', 'S20',
+                'S21', 'S22'
+            ];
+
+            // All outbound names
+            const ALL_OUTBOUNDS = ['OB01', 'OB02', 'OB03', 'OB04', 'OB05', 'OB06', 'OB07', 'OB08', 'OB09', 'OB10'];
+
+            // Transaction history for data preservation
+            let transactionHistory = [];
+            const MAX_HISTORY_SIZE = 10;
+
+            // ==========================================
+            // SWAP STATE MANAGER FOR PERSISTENCE
+            // ==========================================
+
+            /*
+             * KEY FIX EXPLANATION:
+             *
+             * PROBLEM: When hour changes (e.g., 1:00 → 1:30), swaps were storing OLD data
+             *
+             * OLD APPROACH (BROKEN):
+             * 1. Hour 1:00 - Swap S01↔S02, cache their values
+             * 2. Hour 1:30 - Server sends NEW data
+             * 3. Restore function used CACHED values from Hour 1:00
+             *
+             * NEW APPROACH (FIXED):
+             * 1. Hour 1:00 - Swap S01↔S02, only remember WHICH stations are swapped
+             * 2. Hour 1:30 - Server sends NEW data to DOM
+             * 3. Read NEW data from DOM and swap it according to mapping ✓
+             *
+             * This ensures swaps always operate on fresh server data!
+             */
+
+            // Global swap state tracking - FIXED VERSION
+            let swapStateManager = {
+                activeSwaps: new Map(), // station -> partner station (bidirectional mapping)
+
+                // Initialize or reset swap state
+                init() {
+                    this.activeSwaps.clear();
+                    console.log('SwapStateManager initialized');
+                },
+
+                // Register a swap between two stations
+                registerSwap(stationA, stationB) {
+                    console.log(`Registering swap: ${stationA} ↔ ${stationB}`);
+
+                    // Store bidirectional mapping
+                    this.activeSwaps.set(stationA, stationB);
+                    this.activeSwaps.set(stationB, stationA);
+
+                    console.log('Active swaps:', Array.from(this.activeSwaps.entries()));
+
+                    // Save to server database
+                    if (currentSortID) {
+                        saveSwapToServer(currentSortID, this.activeSwaps).then(success => {
+                            if (success) {
+                                console.log('Swap successfully saved to database');
+                                refreshSwapDisplay();
+                            } else {
+                                console.warn('Failed to save swap to database');
+                            }
+                        });
+                    } else {
+                        console.warn('Cannot save swap: currentSortID is not set');
+                    }
+                },
+
+                // Get the partner station that this station is swapped with
+                getSwapPartner(station) {
+                    return this.activeSwaps.get(station);
+                },
+
+                // Check if a station is involved in any swaps
+                isSwapped(station) {
+                    return this.activeSwaps.has(station);
+                },
+
+                // Get all stations involved in swaps
+                getAllSwappedStations() {
+                    return Array.from(this.activeSwaps.keys());
+                },
+
+                // Clear specific swap
+                clearSwap(station) {
+                    const partner = this.activeSwaps.get(station);
+                    if (partner) {
+                        this.activeSwaps.delete(station);
+                        this.activeSwaps.delete(partner);
+                        console.log(`Cleared swap between ${station} and ${partner}`);
+                    }
+                },
+
+                // Clear all swaps
+                clearAllSwaps() {
+                    const swappedStations = this.getAllSwappedStations();
+                    this.init();
+                    console.log('Cleared all swaps');
+
+                    // Clear from server database (send empty mapping)
+                    if (currentSortID) {
+                        saveSwapToServer(currentSortID, new Map()).then(success => {
+                            if (success) {
+                                console.log('Swaps successfully cleared from database');
+                            } else {
+                                console.warn('Failed to clear swaps from database');
+                            }
+                        });
+                    }
+
+                    return swappedStations;
+                },
+
+                // Get swap status summary for UI
+                getSwapSummary() {
+                    const swaps = [];
+                    const processed = new Set();
+
+                    this.activeSwaps.forEach((target, source) => {
+                        if (!processed.has(source) && !processed.has(target)) {
+                            swaps.push({ source, target });
+                            processed.add(source);
+                            processed.add(target);
+                        }
+                    });
+
+                    return swaps;
+                }
+            };
+
+            // Initialize the swap state manager
+            swapStateManager.init();
+
+
+            // ==========================================
+            // SERVER-SIDE SWAP PERSISTENCE
+            // ==========================================
+
+            // Global variable to track current sortID
+            let currentSortID = null;
+
+            // Save swap state to database via SwapStateServer.aspx
+            async function saveSwapToServer(sortID, swapMapping) {
+                console.log('=== SAVE SWAP TO SERVER ===');
+                console.log('SortID:', sortID);
+                console.log('Swap Mapping (Map):', Array.from(swapMapping.entries()));
+
+                try {
+                    // Convert Map to plain object for JSON serialization
+                    const mappingObj = {};
+                    swapMapping.forEach((target, source) => {
+                        mappingObj[source] = target;
+                    });
+
+                    const payload = {
+                        sortid: sortID,
+                        mapping: mappingObj,
+                        message: `Swap state updated at ${new Date().toLocaleString()}`
+                    };
+
+                    console.log('Request Payload:', JSON.stringify(payload, null, 2));
+
+                    const response = await fetch('SwapStateServer.aspx', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    console.log('Response Status:', response.status, response.statusText);
+                    console.log('Response Headers:', {
+                        contentType: response.headers.get('content-type'),
+                        contentLength: response.headers.get('content-length')
+                    });
+
+                    const responseText = await response.text();
+                    console.log('Response Body (raw):', responseText);
+
+                    if (!response.ok) {
+                        console.error(' SAVE FAILED - Response not OK');
+                        try {
+                            const errorData = JSON.parse(responseText);
+                            console.error('Error Data:', errorData);
+                        } catch (e) {
+                            console.error('Could not parse error response as JSON');
+                        }
+                        return false;
+                    }
+
+                    const result = JSON.parse(responseText);
+                    console.log(' SWAP SAVED SUCCESSFULLY:', result);
+                    return true;
+                } catch (error) {
+                    console.error(' EXCEPTION DURING SAVE:');
+                    console.error('Error Type:', error.name);
+                    console.error('Error Message:', error.message);
+                    console.error('Stack Trace:', error.stack);
+                    return false;
+                }
+            }
+
+            // Load swap state from database via SwapStateServer.aspx
+            async function loadSwapFromServer(sortID) {
+                console.log('=== LOAD SWAP FROM SERVER ===');
+                console.log('SortID:', sortID);
+
+                try {
+                    const url = `SwapStateServer.aspx?sortid=${sortID}`;
+                    console.log('Fetching from URL:', url);
+
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    console.log('Response Status:', response.status, response.statusText);
+
+                    if (!response.ok) {
+                        console.error(' LOAD FAILED - Response not OK');
+                        return new Map();
+                    }
+
+                    const responseText = await response.text();
+                    console.log('Response Body (raw):', responseText);
+
+                    const data = JSON.parse(responseText);
+                    console.log('Mapping Object:', data.mapping);
+
+                    // Convert plain object to Map
+                    const swapMap = new Map();
+                    if (data.mapping && typeof data.mapping === 'object') {
+                        Object.entries(data.mapping).forEach(([source, target]) => {
+                            swapMap.set(source, target);
+                        });
+                    }
+
+                    console.log(' SWAP LOADED SUCCESSFULLY - Map size:', swapMap.size);
+                    return swapMap;
+                } catch (error) {
+                    console.error(' EXCEPTION DURING LOAD:');
+                    console.error('Error Type:', error.name);
+                    console.error('Error Message:', error.message);
+                    console.error('Stack Trace:', error.stack);
+                    return new Map();
+                }
+            }
+
+            // Apply loaded swap state to the swap manager
+            function applyLoadedSwapState(swapMap) {
+                console.log('Applying loaded swap state...', swapMap);
+                swapStateManager.activeSwaps = new Map(swapMap);
+            }
+
+
+    </div>
+    </body>
+</html>
                         <option value="S01">S1</option>
                         <option value="S02">S2</option>
                         <option value="S03">S3</option>
@@ -1914,7 +2619,7 @@
                     console.log('Response Body (raw):', responseText);
 
                     if (!response.ok) {
-                        console.error('❌ SAVE FAILED - Response not OK');
+                        console.error(' SAVE FAILED - Response not OK');
                         try {
                             const errorData = JSON.parse(responseText);
                             console.error('Error Data:', errorData);
@@ -1925,10 +2630,10 @@
                     }
 
                     const result = JSON.parse(responseText);
-                    console.log('✅ SWAP SAVED SUCCESSFULLY:', result);
+                    console.log(' SWAP SAVED SUCCESSFULLY:', result);
                     return true;
                 } catch (error) {
-                    console.error('❌ EXCEPTION DURING SAVE:');
+                    console.error(' EXCEPTION DURING SAVE:');
                     console.error('Error Type:', error.name);
                     console.error('Error Message:', error.message);
                     console.error('Stack Trace:', error.stack);
@@ -1962,7 +2667,7 @@
                     console.log('Response Body (raw):', responseText);
 
                     if (!response.ok) {
-                        console.error('❌ LOAD FAILED - Response not OK');
+                        console.error(' LOAD FAILED - Response not OK');
                         return null;
                     }
 
@@ -1982,15 +2687,15 @@
                             console.log(`  Adding to Map: ${source} -> ${target}`);
                         });
 
-                        console.log('✅ SWAP LOADED SUCCESSFULLY - Map size:', swapMap.size);
+                        console.log(' SWAP LOADED SUCCESSFULLY - Map size:', swapMap.size);
                         console.log('Final Swap Map:', Array.from(swapMap.entries()));
                         return swapMap;
                     }
 
-                    console.log('⚠️ No valid mapping found in response');
+                    console.log(' No valid mapping found in response');
                     return null;
                 } catch (error) {
-                    console.error('❌ EXCEPTION DURING LOAD:');
+                    console.error(' EXCEPTION DURING LOAD:');
                     console.error('Error Type:', error.name);
                     console.error('Error Message:', error.message);
                     console.error('Stack Trace:', error.stack);
@@ -3246,7 +3951,7 @@
                 const debugMsg = `=== SWAP DEBUG INFO ===
 
 Active Swaps: ${swapSummary.length} pair(s)
-${swapSummary.map(s => `  • ${s.source} ↔ ${s.target}`).join('\n') || '  None'}
+${swapSummary.map(s => `   ${s.source} to ${s.target}`).join('\n') || '  None'}
 
 Transaction History: ${transactionHistory.length} transaction(s)
 ${transactionSummary}
@@ -3275,5 +3980,3 @@ Current Sort ID: ${currentSortID || 'Not set'}
         </script>
 
 </body>
-
-</html>
